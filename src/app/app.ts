@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { WeatherService } from './services/weather';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { WeatherService } from './services/weather';
 import { KelvinToCelsiusPipe } from './pipes/kelvin-to-celsius-pipe';
 
 @Component({
@@ -17,9 +17,30 @@ export class App {
   forecast: any[] = [];
   loading = false;
   error = '';
+
   recentSearches: string[] = [];
+  filteredCities: string[] = [];
 
   constructor(private weatherService: WeatherService) {}
+
+  onCityInput() {
+    const search = this.city.toLowerCase().trim();
+
+    if (!search) {
+      this.filteredCities = [];
+      return;
+    }
+
+    this.filteredCities = this.recentSearches.filter(city =>
+      city.toLowerCase().includes(search)
+    );
+  }
+
+  selectCity(city: string) {
+    this.city = city;
+    this.filteredCities = [];
+    this.searchWeather();
+  }
 
   searchWeather() {
     if (!this.city.trim()) return;
@@ -28,6 +49,7 @@ export class App {
     this.error = '';
     this.weather = null;
     this.forecast = [];
+    this.filteredCities = [];
 
     const cityName = this.city.trim();
 
@@ -44,7 +66,9 @@ export class App {
 
     this.weatherService.getForecast(cityName).subscribe({
       next: data => {
-        this.forecast = data.list.filter((item: any, index: number) => index % 8 === 0);
+        this.forecast = data.list.filter(
+          (_item: any, index: number) => index % 8 === 0
+        );
         this.loading = false;
       },
       error: err => {
@@ -57,12 +81,15 @@ export class App {
   saveSearch(city: string) {
     this.recentSearches = [
       city,
-      ...this.recentSearches.filter(c => c.toLowerCase() !== city.toLowerCase())
+      ...this.recentSearches.filter(
+        savedCity => savedCity.toLowerCase() !== city.toLowerCase()
+      )
     ].slice(0, 5);
   }
 
   selectRecent(city: string) {
     this.city = city;
+    this.filteredCities = [];
     this.searchWeather();
   }
 }

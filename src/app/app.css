@@ -76,3 +76,35 @@ button {
     background: rgba(255, 255, 255, 0.2);
     cursor: pointer;
 }
+
+.input-wrapper {
+    position: relative;
+    width: 280px;
+}
+
+.input-wrapper input {
+    width: 100%;
+}
+
+.dropdown {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 10;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.dropdown-item {
+    padding: 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-item:hover {
+    background: #dbeafe;
+}

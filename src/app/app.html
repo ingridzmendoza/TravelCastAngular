@@ -3,16 +3,16 @@
   <p>Consulta el clima de cualquier ciudad del mundo</p>
 
   <div class="search-box">
-    <input
-      type="text"
-      [(ngModel)]="city"
-      placeholder="Buscar ciudad..."
-      list="recentCities"
-    />
+    <div class="input-wrapper">
+      <input type="text" [(ngModel)]="city" (input)="onCityInput()" (keyup.enter)="searchWeather()"
+        placeholder="Buscar ciudad..." />
 
-    <datalist id="recentCities">
-      <option *ngFor="let city of recentSearches" [value]="city"></option>
-    </datalist>
+      <div class="dropdown" *ngIf="filteredCities.length > 0">
+        <div class="dropdown-item" *ngFor="let city of filteredCities" (mousedown)="selectCity(city)">
+          {{ city }}
+        </div>
+      </div>
+    </div>
 
     <button (click)="searchWeather()">Buscar</button>
   </div>
@@ -34,10 +34,7 @@
   <div class="weather-card" *ngIf="weather">
     <h2>{{ weather.name }}, {{ weather.sys.country }}</h2>
 
-    <img
-      [src]="'https://openweathermap.org/img/wn/' + weather.weather[0].icon + '@2x.png'"
-      alt="Weather icon"
-    />
+    <img [src]="'https://openweathermap.org/img/wn/' + weather.weather[0].icon + '@2x.png'" alt="Weather icon" />
 
     <h3>{{ weather.main.temp | kelvinToCelsius }} °C</h3>
 
@@ -50,10 +47,7 @@
     <div class="forecast-card" *ngFor="let day of forecast">
       <p>{{ day.dt_txt | date:'mediumDate' }}</p>
 
-      <img
-        [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '@2x.png'"
-        alt="Forecast icon"
-      />
+      <img [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '@2x.png'" alt="Forecast icon" />
 
       <h4>{{ day.main.temp | kelvinToCelsius }} °C</h4>
       <p>{{ day.weather[0].description }}</p>
