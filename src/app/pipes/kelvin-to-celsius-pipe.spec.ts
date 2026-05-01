@@ -1,8 +1,11 @@
-import { KelvinToCelsiusPipe } from './kelvin-to-celsius-pipe';
+import { Pipe, PipeTransform } from '@angular/core';
 
-describe('KelvinToCelsiusPipe', () => {
-  it('create an instance', () => {
-    const pipe = new KelvinToCelsiusPipe();
-    expect(pipe).toBeTruthy();
-  });
-});
+@Pipe({
+  name: 'kelvinToCelsius',
+  standalone: true
+})
+export class KelvinToCelsiusPipe implements PipeTransform {
+  transform(value: number): number {
+    return Math.round(value - 273.15);
+  }
+}
