@@ -1,56 +1,88 @@
-<div class="container">
-  <h1>Travel Cast</h1>
-  <p>Consulta el clima de cualquier ciudad del mundo</p>
+<main>
+  <header>
+    <h1>Travel Cast</h1>
+    <p>Consulta el clima y descubre qué hacer en tu destino</p>
+  </header>
 
-  <div class="search-box">
-    <div class="input-wrapper">
-      <input type="text" [(ngModel)]="city" (input)="onCityInput()" (keyup.enter)="searchWeather()"
-        placeholder="Buscar ciudad..." />
+  <section class="search-section">
+    <form (submit)="onSubmit($event)">
+      <div class="input-wrapper">
+        <input type="text" name="city" [(ngModel)]="city" (input)="onCityInput()" placeholder="Buscar ciudad..."
+          autocomplete="off" />
 
-      <div class="dropdown" *ngIf="filteredCities.length > 0">
-        <div class="dropdown-item" *ngFor="let city of filteredCities" (mousedown)="selectCity(city)">
-          {{ city }}
-        </div>
+        <ul class="suggestions-list" *ngIf="suggestions.length > 0">
+          <li *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion)">
+            {{ suggestion.name }}, {{ suggestion.country }}
+          </li>
+        </ul>
+      </div>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Buscando...' : 'Buscar' }}
+      </button>
+    </form>
+  </section>
+
+  <p class="loading" *ngIf="loading">Cargando el clima...</p>
+  <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <section class="weather-layout" *ngIf="weather">
+    <div class="weather-result">
+      <h2>{{ weather.name }}</h2>
+
+      <div class="weather-icon-box">
+        <img [src]="'https://openweathermap.org/img/wn/' + weather.weather[0].icon + '@2x.png'"
+          [alt]="weather.weather[0].description" />
+      </div>
+
+      <p>Temperatura: {{ convertTemp(weather.main.temp) | number:'1.1-1' }} °{{ currentUnit }}</p>
+      <p>Clima: {{ weather.weather[0].description }}</p>
+
+      <button class="favorite-btn" (click)="saveFavorite(weather.name)">
+        Agregar a favoritos ♥
+      </button>
+
+      <button class="unit-btn" (click)="toggleUnit()">
+        Cambiar a °{{ currentUnit === 'C' ? 'F' : 'C' }}
+      </button>
+    </div>
+
+    <div class="forecast">
+      <h2>Pronóstico 5 días</h2>
+
+      <div class="forecast-day" *ngFor="let day of forecast">
+        <p>{{ day.dt_txt | date:'dd/MM/yyyy' }}</p>
+        <img [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '.png'"
+          [alt]="day.weather[0].description" />
+        <p>{{ convertTemp(day.main.temp) | number:'1.1-1' }} °{{ currentUnit }}</p>
+        <p>{{ day.weather[0].description }}</p>
       </div>
     </div>
+  </section>
 
-    <button (click)="searchWeather()">Buscar</button>
-  </div>
+  <section class="recommendations" *ngIf="recommendations.length > 0">
+    <h2>Recomendaciones para tu viaje</h2>
+    <ul>
+      <li *ngFor="let item of recommendations">{{ item }}</li>
+    </ul>
+  </section>
 
-  <div class="recent" *ngIf="recentSearches.length > 0">
-    <span *ngFor="let city of recentSearches" (click)="selectRecent(city)">
-      {{ city }}
-    </span>
-  </div>
+  <section class="favorites" *ngIf="favorites.length > 0">
+    <h2>Ciudades Favoritas</h2>
+    <ul>
+      <li *ngFor="let favorite of favorites" (click)="searchWeather(favorite)">
+        {{ favorite }}
+        <button class="remove-btn" (click)="removeFavorite(favorite, $event)">X</button>
+      </li>
+    </ul>
+  </section>
 
-  <div class="spinner" *ngIf="loading">
-    Cargando clima...
-  </div>
-
-  <div class="error" *ngIf="error">
-    {{ error }}
-  </div>
-
-  <div class="weather-card" *ngIf="weather">
-    <h2>{{ weather.name }}, {{ weather.sys.country }}</h2>
-
-    <img [src]="'https://openweathermap.org/img/wn/' + weather.weather[0].icon + '@2x.png'" alt="Weather icon" />
-
-    <h3>{{ weather.main.temp | kelvinToCelsius }} °C</h3>
-
-    <p>Sensación térmica: {{ weather.main.feels_like | kelvinToCelsius }} °C</p>
-    <p>Humedad: {{ weather.main.humidity }}%</p>
-    <p>{{ weather.weather[0].description }}</p>
-  </div>
-
-  <div class="forecast-grid" *ngIf="forecast.length > 0">
-    <div class="forecast-card" *ngFor="let day of forecast">
-      <p>{{ day.dt_txt | date:'mediumDate' }}</p>
-
-      <img [src]="'https://openweathermap.org/img/wn/' + day.weather[0].icon + '@2x.png'" alt="Forecast icon" />
-
-      <h4>{{ day.main.temp | kelvinToCelsius }} °C</h4>
-      <p>{{ day.weather[0].description }}</p>
-    </div>
-  </div>
-</div>
+  <section class="history" *ngIf="history.length > 0">
+    <h2>Últimas Búsquedas</h2>
+    <ul>
+      <li *ngFor="let item of history" (click)="searchWeather(item)">
+        {{ item }}
+      </li>
+    </ul>
+  </section>
+</main>
